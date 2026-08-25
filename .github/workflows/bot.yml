@@ -1,16 +1,16 @@
 name: Telegram Bot
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "*/30 * * * *"
-  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Get code
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -21,7 +21,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run bot
+      - name: Run bot for 25 minutes
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: python bot.py
+        run: |
+          timeout 25m python bot.py
