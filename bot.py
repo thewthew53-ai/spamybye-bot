@@ -6,7 +6,9 @@ BOT_TOKEN = os.environ["BOT_TOKEN"]
 
 KEYWORDS = [
     "dm",
-    "message me"
+    "message me",
+    "whatsapp.com",
+    "boom",
 ]
 
 
@@ -16,8 +18,18 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not message:
         return
 
-    text = message.text or message.caption or ""
+    # Delete every image, whether it has a caption or not
+    if message.photo:
+        try:
+            await message.delete()
+            print("Deleted image")
+        except Exception as e:
+            print(f"Could not delete image: {e}")
 
+        return
+
+    # Check text and captions for keywords
+    text = message.text or message.caption or ""
     text = text.lower()
 
     for keyword in KEYWORDS:
@@ -33,6 +45,7 @@ async def check_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 app = Application.builder().token(BOT_TOKEN).build()
 
+# Receive channel posts, including text, images, videos, etc.
 app.add_handler(
     MessageHandler(
         filters.UpdateType.CHANNEL_POST,
